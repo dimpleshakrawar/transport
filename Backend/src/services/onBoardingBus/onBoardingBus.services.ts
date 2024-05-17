@@ -1,9 +1,9 @@
 import express, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import { resObj } from "../../../../util/types";
+import { resObj } from "../../utils/types";
 import { OnBoardingBusDataValidationSchema } from "../../validators/onBoardingBus/onBoardingBus.validator";
-import CommonRes from "../../../../util/helper/commonResponse";
-import { excludeFields } from "../../../../util/helper/excludeFieldsfromdbData";
+import CommonRes from "../../utils/helper/commonResponse";
+import { excludeFields } from "../../utils/helper/excludeFieldsfromdbData";
 
 type TOnBoardingBusData = {
   registration_no: string;

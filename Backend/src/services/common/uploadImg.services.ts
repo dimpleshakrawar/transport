@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import CommonRes from "../../../../util/helper/commonResponse";
-import { resMessage } from "../../../../util/common";
-import { resObj } from "../../../../util/types";
-import { Prisma, PrismaClient } from "@prisma/client";
+import CommonRes from "../../utils/helper/commonResponse";
+import { resMessage } from "../../utils/common";
+import { resObj } from "../../utils/types";
 
 export class UploadImgServices {
   // public prisma = new PrismaClient();

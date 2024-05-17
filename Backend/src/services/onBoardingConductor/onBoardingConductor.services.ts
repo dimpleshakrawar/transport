@@ -1,11 +1,10 @@
 import express, { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import { resObj } from "../../../../util/types";
-import { OnBoardingBusDataValidationSchema } from "../../validators/onBoardingBus/onBoardingBus.validator";
-import CommonRes from "../../../../util/helper/commonResponse";
+import { resObj } from "../../utils/types";
+import CommonRes from "../../utils/helper/commonResponse";
 import { OnBoardingConductorDataValidationSchema } from "../../validators/onBoardingConductor/onBoardingConductor.validator";
-import generateUniqueId from "../../../../util/helper/generateUniqueNo";
-import { excludeFields } from "../../../../util/helper/excludeFieldsfromdbData";
+import generateUniqueId from "../../utils/helper/generateUniqueNo";
+import { excludeFields } from "../../utils/helper/excludeFieldsfromdbData";
 
 type TOnBoardingConductorData = {
   firstName: string;

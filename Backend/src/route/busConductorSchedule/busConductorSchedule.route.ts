@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
-import { baseUrl } from "../../../../util/common";
-import multer, { Multer } from "multer";
-import BusConductorScheduleServices from "../../controller/busConductorSchedule/busConductorSchedule.services";
+import { baseUrl } from "../../utils/common";
+import BusConductorScheduleServices from "../../services/busConductorSchedule/busConductorSchedule.services";
 
 export default class BusConductorScheduleRoute {
   constructor(app: express.Application) {

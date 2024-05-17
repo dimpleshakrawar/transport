@@ -1,4 +1,4 @@
-import type { ReceiptType } from "../../../../util/types/receipt/receipt.type";
+import type { ReceiptType } from "../../utils/types/receipt/receipt.type";
 import * as Yup from "yup";
 
 export const receiptValidatorData = (receipt: ReceiptType): ReceiptType => {

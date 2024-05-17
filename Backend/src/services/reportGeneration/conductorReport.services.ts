@@ -1,12 +1,11 @@
 import express, { Request, Response } from "express";
 import { Prisma, PrismaClient } from "@prisma/client";
-import { resObj } from "../../../../util/types";
-import CommonRes from "../../../../util/helper/commonResponse";
+import { resObj } from "../../utils/types";
+import CommonRes from "../../utils/helper/commonResponse";
 import {
   ConductorReportMonthlyValidationSchema,
   ConductorReportValidationSchema,
 } from "../../validators/conductorReportGen/conductorReportValidator";
-import { toNumber } from "lodash";
 
 type TQuery = [
   {
