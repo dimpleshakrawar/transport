@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { PrismaClient } from "@prisma/client";
-import { generateRes } from "../../../../util/generateRes";
-import { generateReceiptNumber } from "../../../../util/helper/generateUniqueNo";
+import { generateRes } from "../../utils/generateRes";
+import { generateReceiptNumber } from "../../utils/helper/generateUniqueNo";
 
 const prisma = new PrismaClient();
 

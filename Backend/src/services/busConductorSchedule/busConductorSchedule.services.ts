@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
-import CommonRes from "../../../../util/helper/commonResponse";
+import CommonRes from "../../utils/helper/commonResponse";
 import { PrismaClient } from "@prisma/client";
-import { resObj } from "../../../../util/types";
+import { resObj } from "../../utils/types";
 import { ScheduleBusConductorValidationSchema } from "../../validators/scheduleBusConductor/scheduleBusConductor.validator";
 
 export default class BusConductorScheduleServices {

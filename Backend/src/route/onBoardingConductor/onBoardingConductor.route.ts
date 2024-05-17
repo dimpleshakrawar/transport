@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
-import { baseUrl } from "../../../../util/common";
-import multer, { Multer } from "multer";
-import OnBoardingConductorServices from "../../controller/onBoardingConductor/onBoardingConductor.services";
+import { baseUrl } from "../../utils/common";
+import OnBoardingConductorServices from "../../services/onBoardingConductor/onBoardingConductor.services";
 
 export default class OnBoardingConductorRoute {
   constructor(app: express.Application) {

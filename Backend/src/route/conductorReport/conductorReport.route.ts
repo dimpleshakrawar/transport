@@ -1,8 +1,6 @@
 import express, { Request, Response } from "express";
-import { baseUrl } from "../../../../util/common";
-import multer, { Multer } from "multer";
-import OnBoardingBusServices from "../../controller/onBoardingBus/onBoardingBus.services";
-import ConductorGenerateReportServices from "../../controller/reportGeneration/conductorReport.services";
+import { baseUrl } from "../../utils/common";
+import ConductorGenerateReportServices from "../../services/reportGeneration/conductorReport.services";
 
 export default class ConductorReportRoute {
   constructor(app: express.Application) {

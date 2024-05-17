@@ -1,8 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
-import ReceiptServices from "../../controller/receipt/receipt.services";
-import { baseUrl } from "../../../../util/common";
+import { baseUrl } from "../../utils/common";
 import multer from "multer";
-import { UploadImgServices } from "../../controller/common/uploadImg.services";
+import { UploadImgServices } from "../../services/common/uploadImg.services";
 
 const storage = multer.memoryStorage();
 

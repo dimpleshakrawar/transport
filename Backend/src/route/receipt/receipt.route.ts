@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
-import ReceiptServices from "../../controller/receipt/receipt.services";
-import { baseUrl } from "../../../../util/common";
-import { responseTime } from "../../../../middleware/responseTime";
+import ReceiptServices from "../../services/receipt/receipt.services";
+import { baseUrl } from "../../utils/common";
+import { responseTime } from "../../middleware/responseTime";
 
 class ReceiptRoute {
   constructor(app: express.Application) {

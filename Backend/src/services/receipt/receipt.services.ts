@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import ReceiptDao from "../../dao/receipt/receipt.dao";
-import CommonRes from "../../../../util/helper/commonResponse";
-import { resMessage } from "../../../../util/common";
-import { resObj } from "../../../../util/types";
+import CommonRes from "../../utils/helper/commonResponse";
+import { resMessage } from "../../utils/common";
+import { resObj } from "../../utils/types";
 import { receiptValidationSchema } from "../../validators/receipt/receipt.validator";
 
 class ReceiptServices {
