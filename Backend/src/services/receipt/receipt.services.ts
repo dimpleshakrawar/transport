@@ -65,14 +65,14 @@ class ReceiptServices {
       await receiptValidationSchema.validate(req.body.data);
       const data = await this.receiptDao.post(req);
 
-      // if (!data) {
-      //   return CommonRes.NOT_FOUND(
-      //     resMessage(this.initMsg).NOT_FOUND,
-      //     data,
-      //     resObj,
-      //     res
-      //   );
-      // }
+      if (!data) {
+        return CommonRes.NOT_FOUND(
+          resMessage(this.initMsg).NOT_FOUND,
+          data,
+          resObj,
+          res
+        );
+      }
 
       return CommonRes.SUCCESS(
         resMessage(this.initMsg).FOUND,

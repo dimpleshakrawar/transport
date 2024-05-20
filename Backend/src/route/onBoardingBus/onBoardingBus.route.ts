@@ -15,7 +15,7 @@ export default class OnBoardingBusRoute {
     app
       .route(`${baseUrl}/onBoardingBus`)
       .post((req: Request, res: Response) =>
-        onBoardingBusServices.onBoardingNewBus(req, res, "021G")
+        onBoardingBusServices.onBoardingNewBus(req, res, "021P")
       );
 
     app

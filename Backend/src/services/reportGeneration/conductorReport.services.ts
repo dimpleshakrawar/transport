@@ -5,6 +5,7 @@ import CommonRes from "../../utils/helper/commonResponse";
 import {
   ConductorReportMonthlyValidationSchema,
   ConductorReportValidationSchema,
+  ConductorReportWithAmountValidationSchema,
 } from "../../validators/conductorReportGen/conductorReportValidator";
 
 type TQuery = [
@@ -19,6 +20,18 @@ type TQuery = [
     updated_at: Date;
   }
 ];
+
+type Collection = {
+  id: number;
+  conductor_id: number;
+  bus_id: string;
+  receipt_no: string;
+  amount: number;
+  date: Date;
+  time: number;
+  created_at?: Date;
+  updated_at?: Date;
+};
 
 export default class ConductorGenerateReportServices {
   public prisma = new PrismaClient();
@@ -41,63 +54,63 @@ export default class ConductorGenerateReportServices {
 
       const setDate = new Date(currentDate);
 
-      // const dailyCollectionReport = await this.prisma.$queryRaw<any[]>`
-      // SELECT bus_id, SUM(amount)::INTEGER AS "Total Amount"
-      // FROM receipts
-      // WHERE conductor_id = ${intConductorId} and date::date = ${setDate}::date
-      // GROUP BY bus_id
-      // left join scheduler
-      // WHERE conductor_id = ${intConductorId} and date::date = ${setDate}::date
-      // `;
+      //   const dailyCollectionReport = await this.prisma.$queryRaw<any[]>`
+      //   select rr.bus_id, rr.total_amount, ss.from_time, ss.to_time from (
+      //   (SELECT r.bus_id, SUM(r.amount)::INTEGER AS "total_amount"
+      //   FROM receipts r
+      //   WHERE r.conductor_id = ${intConductorId}
+      //   AND r.date::date = ${setDate}::date
+      //   GROUP BY r.bus_id) rr
 
+      //   left join
+
+      //   (select * from scheduler s
+      //   where s.date::date = ${setDate}::date and s.conductor_id = ${intConductorId}) ss
+
+      //   on rr.bus_id = ss.bus_id);
+      //  `;
+
+      //getting daily collection
       const dailyCollectionReport = await this.prisma.$queryRaw<any[]>`
-      select rr.bus_id, rr.total_amount, ss.from_time, ss.to_time from (
-      (SELECT r.bus_id, SUM(r.amount)::INTEGER AS "total_amount"
-      FROM receipts r 
-      WHERE r.conductor_id = ${intConductorId}
-      AND r.date::date = ${setDate}::date
-      GROUP BY r.bus_id) rr
-      
-      left join 
-      
-      (select * from scheduler s
-      where s.date::date = ${setDate}::date and s.conductor_id = ${intConductorId}) ss 
-      
-      on rr.bus_id = ss.bus_id);
-     `;
+        SELECT *
+        FROM receipts 
+        WHERE conductor_id = ${intConductorId} 
+        AND date = ${setDate}::date
+       `;
 
-      console.log(intConductorId);
+      //getting net day amount
+      const dailyNetAmount = await this.prisma.$queryRaw<any[]>`
+      SELECT conductor_id, SUM(receipts.amount)::INTEGER AS "total_amount"
+      FROM receipts
+      WHERE conductor_id = ${intConductorId} and date = ${setDate}::date
+      GROUP BY conductor_id
+       `;
+
+      console.log(dailyNetAmount, "ammount===============");
+
+      const collData: { [key: string]: Collection[] } = {};
+
+      //filtering data acc to busId received from db
+      dailyCollectionReport.length &&
+        dailyCollectionReport.forEach((data) => {
+          if (!collData[data.bus_id]) {
+            collData[data.bus_id] = []; // Initialize as an empty array if it does not exist
+          }
+          collData[data.bus_id].push(data); // Push the data into the array
+        });
+
+      console.log(collData, "collData==================>>>>");
 
       console.log(dailyCollectionReport, "dailyCollectionReport=========>>");
 
-      // const dailyCollectionReportss = await this.prisma.$queryRaw`
-      // SELECT from_time to_time
-      // FROM scheduler
-      // WHERE conductor_id = ${intConductorId} and date::date = ${setDate}::date and bus_id= ${dailyCollectionReport.bus_id}
-      // GROUP BY from_time to_time;
-      // `;
-
-      // checking if conductor already exist
-      // const getDailyReport = await this.prisma.receipts.aggregate({
-      //   where: { conductor_id: intConductorId, date: setDate },
-      //   _sum: {
-      //     amount: true,
-      //   },
-      // });
-
-      // const getDailyData = await this.prisma.receipts.findMany({
-      //   where: { conductor_id: intConductorId, date: setDate },
-      // });
-
-      // const newData = {
-      //   total_amount: getDailyReport._sum.amount,
-      //   data: getDailyData,
-      // };
-      // console.log(getDailyReport, "getDailyReport==========>>>");
+      const newData = {
+        total_amount: dailyNetAmount[0]?.total_amount,
+        data: collData,
+      };
 
       return CommonRes.SUCCESS(
         "Daily collection generated successfully",
-        dailyCollectionReport,
+        newData,
         resObj,
         res
       );
@@ -105,6 +118,60 @@ export default class ConductorGenerateReportServices {
       console.log(err, "error in generating daily collection");
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
+  };
+
+  getReportByamount = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "POST",
+      version: "1.0",
+    };
+    try {
+      const { amount } = req.params;
+      const intAmount = parseInt(amount);
+
+      const { conductor_id, bus_id, date } = req.body;
+
+      //validations
+      await ConductorReportWithAmountValidationSchema.validate({
+        ...req.body,
+        amount,
+      });
+
+      //data based on amount from params
+      const fetchedData = await this.prisma.$queryRaw`
+      select * from receipts 
+      where conductor_id = ${conductor_id} and bus_id = ${bus_id} and amount = ${intAmount} and date=${date}::date
+      `;
+
+      console.log(fetchedData, "fetchedDData==========>>>");
+
+      //total collection of amount received from params
+      const fetchedAmount = await this.prisma.$queryRaw<any[]>`
+      select conductor_id,bus_id, SUM(receipts.amount)::INTEGER AS "total_amount" from receipts
+      where conductor_id = ${conductor_id} and bus_id = ${bus_id} and amount = ${intAmount} and date=${date}::date
+      group by conductor_id,bus_id
+      `;
+
+      const resWithAmount = {
+        data: fetchedData,
+        total_amount: fetchedAmount[0]?.total_amount,
+      };
+
+      console.log(fetchedAmount, "fetchedAmount==========>>>");
+
+      return CommonRes.SUCCESS(
+        "Daily collection generated successfully",
+        resWithAmount,
+        resObj,
+        res
+      );
+    } catch (err) {
+      console.log(err, "error in generating daily collection by amount");
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+
+    // const getAmountByConductorId =
   };
 
   getMonthlyCollection = async (req: Request, res: Response, apiId: string) => {
@@ -130,16 +197,25 @@ export default class ConductorGenerateReportServices {
           res
         );
 
-      const query: TQuery = await this.prisma.$queryRaw`SELECT *
-        from 
-        receipts
-        where conductor_id = ${Number(
-          conductor_id
-        )} and EXTRACT(MONTH FROM date) = ${Number(
+      const query: TQuery = await this.prisma.$queryRaw`
+      SELECT * from receipts
+      where conductor_id = ${Number(
+        conductor_id
+      )} and EXTRACT(MONTH FROM date) = ${Number(
         onlyMonth
       )} and EXTRACT(YEAR FROM date) = ${Number(onlyYear)}
         `;
-      console.log("first", query);
+
+      // const query = await this.prisma.$queryRaw<any[]>`
+      //   select bus_id from receipts
+      //   where conductor_id = ${Number(
+      //     conductor_id
+      //   )} and EXTRACT(MONTH FROM date) = ${Number(
+      //   onlyMonth
+      // )} and EXTRACT(YEAR FROM date) = ${Number(onlyYear)}
+      // group by conductor_id = ${Number(conductor_id)}
+      //   `;
+      // console.log("first", query);
 
       const totalAmount = query.reduce((total, item) => total + item.amount, 0);
       const newRes = { data: query, totalAmount };

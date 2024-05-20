@@ -2,6 +2,7 @@ import { Request } from "express";
 import { PrismaClient } from "@prisma/client";
 import { generateRes } from "../../utils/generateRes";
 import { generateReceiptNumber } from "../../utils/helper/generateUniqueNo";
+import CommonRes from "../../utils/helper/commonResponse";
 
 const prisma = new PrismaClient();
 
@@ -13,8 +14,6 @@ class ReceiptDao {
   };
 
   post = async (req: Request) => {
-    // const body = receiptValidatorData(req.body.data);
-    console.log("before creating");
     console.log(req.body.data, "req.body.data");
 
     const time = Number(req.body.data.time);
@@ -29,7 +28,7 @@ class ReceiptDao {
 
     console.log(scheduleRecord, "scheduleRecord==============");
 
-    if (scheduleRecord.length <= 0) return;
+    if (!scheduleRecord.length) return;
 
     const data = await prisma.receipts.create({
       data: {
@@ -43,7 +42,8 @@ class ReceiptDao {
         conductor: { connect: { cunique_id: req.body.data.conductor_id } },
       },
     });
-    console.log(data, "after creating");
+
+    if (!Object.keys(data).length) return;
 
     const receipt_no = generateReceiptNumber(data.id);
     const dataWithReceiptNo = await prisma.receipts.update({

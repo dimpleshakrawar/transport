@@ -20,9 +20,15 @@ export default class ConductorReportRoute {
       );
 
     app
+      .route(`${baseUrl}/report/conductor-report/:amount`)
+      .post((req: Request, res: Response) =>
+        conductorGenerateReportServices.getReportByamount(req, res, "052P")
+      );
+
+    app
       .route(`${baseUrl}/report/conductor-monthwise`)
       .post((req: Request, res: Response) =>
-        conductorGenerateReportServices.getMonthlyCollection(req, res, "051G")
+        conductorGenerateReportServices.getMonthlyCollection(req, res, "053P")
       );
   }
 }
