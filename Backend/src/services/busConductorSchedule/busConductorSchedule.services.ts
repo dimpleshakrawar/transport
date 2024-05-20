@@ -113,44 +113,11 @@ export default class BusConductorScheduleServices {
         );
       }
 
-      //checking if bus schedule for that time and date slot already exist
-      const isExistingBusSchedule = await this.prisma.$queryRaw<any[]>`
-      select * from scheduler
-      where bus_id = ${bus_no} and date = date and from_time= ${setFromTime} and to_time = ${setToTime}`;
-
-      console.log(isExistingBusSchedule, "isExistingBusSchedule========>>>s");
-
-      if (isExistingBusSchedule.length > 0) {
-        return CommonRes.VALIDATION_ERROR(
-          "Bus Schedule already exists",
-          resObj,
-          res
-        );
-      }
-
-      //checking if bus schedule for that time and date slot already exist
-      const isExistingConductorSchedule = await this.prisma.$queryRaw<any[]>`
-      select * from scheduler
-      where conductor_id = ${conductor_id} and date = date and from_time= ${setFromTime} and to_time = ${setToTime}`;
-
-      console.log(
-        isExistingConductorSchedule,
-        "isExistingConductorSchedule========>>>s"
-      );
-
-      if (isExistingConductorSchedule.length > 0) {
-        return CommonRes.VALIDATION_ERROR(
-          "Conductor Schedule already exists",
-          resObj,
-          res
-        );
-      }
-
       //checking if bus is scheduled for same conductor
       const isExistingSchedule = await this.prisma.$queryRaw<any[]>`
-      select * from scheduler
-      where bus_id = ${bus_no} and conductor_id = ${conductor_id} and date = ${date}::date or from_time=${setFromTime} and to_time = ${setToTime}
-      `;
+       select * from scheduler
+       where bus_id = ${bus_no} and conductor_id = ${conductor_id} and date = ${date}::date and from_time=${setFromTime} and to_time = ${setToTime}
+       `;
 
       console.log(isExistingSchedule, "isExistingSchedule========>>>s");
 
@@ -161,6 +128,49 @@ export default class BusConductorScheduleServices {
           res
         );
       }
+
+      //checking if bus schedule for that time and date slot already exist
+      const isExistingBusSchedule = await this.prisma.$queryRaw<any[]>`
+      select * from scheduler
+      where bus_id = ${bus_no} and date = ${date}::date 
+      AND NOT (
+      (from_time < ${setToTime} AND to_time > ${setFromTime})
+    )`;
+
+      console.log(isExistingBusSchedule, "isExistingBusSchedule========>>>s");
+
+      if (isExistingBusSchedule.length > 0) {
+        return CommonRes.VALIDATION_ERROR(
+          "Bus Schedule already exist for this date and time slot",
+          resObj,
+          res
+        );
+      }
+
+      //checking if conductor schedule for that time and date slot already exist
+      const isExistingConductorSchedule = await this.prisma.$queryRaw<any[]>`
+      select * from scheduler
+      where conductor_id = ${conductor_id} and date = ${date}::date 
+      AND NOT (
+      (from_time < ${setToTime} AND to_time > ${setFromTime})
+
+    )
+    ;`;
+
+      console.log(
+        isExistingConductorSchedule,
+        "isExistingConductorSchedule========>>>s"
+      );
+
+      if (isExistingConductorSchedule.length > 0) {
+        return CommonRes.VALIDATION_ERROR(
+          "Conductor Schedule already exists for this date and time slot",
+          resObj,
+          res
+        );
+      }
+
+      console.log(bus_no, "bus_no====>", intConductorId, "intConductorId");
 
       const createNewSchedule = await this.prisma.scheduler.create({
         data: {
@@ -179,7 +189,7 @@ export default class BusConductorScheduleServices {
         res
       );
     } catch (err) {
-      console.log(err, "error in ceating schedule");
+      console.log(err, "error in creating schedule");
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };
@@ -243,6 +253,29 @@ export default class BusConductorScheduleServices {
       );
     } catch (err) {
       console.log(err, "error in updating already created schedule");
+      return CommonRes.SERVER_ERROR(err, resObj, res);
+    }
+  };
+
+  getAllScheduelesList = async (req: Request, res: Response, apiId: string) => {
+    const resObj: resObj = {
+      apiId,
+      action: "GET",
+      version: "1.0",
+    };
+    try {
+      const getAllList = await this.prisma.$queryRaw`
+      select * from scheduler
+      `;
+
+      return CommonRes.SUCCESS(
+        "All Schedules fetched successfully!",
+        getAllList,
+        resObj,
+        res
+      );
+    } catch (err) {
+      console.log(err, "error in getting all schedule List");
       return CommonRes.SERVER_ERROR(err, resObj, res);
     }
   };

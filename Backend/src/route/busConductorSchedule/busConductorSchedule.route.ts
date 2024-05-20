@@ -41,5 +41,11 @@ export default class BusConductorScheduleRoute {
           "042P"
         )
       );
+
+    app
+      .route(`${baseUrl}/schedule/getAllScheduleList`)
+      .get((req: Request, res: Response) =>
+        busConductorScheduleServices.getAllScheduelesList(req, res, "042P")
+      );
   }
 }

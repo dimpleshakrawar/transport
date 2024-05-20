@@ -15,13 +15,13 @@ export default class OnBoardingConductorRoute {
     app
       .route(`${baseUrl}/onBoardingConductor`)
       .post((req: Request, res: Response) =>
-        onBoardingConductorServices.onBoardingNewConductor(req, res, "021G")
+        onBoardingConductorServices.onBoardingNewConductor(req, res, "031P")
       );
 
     app
       .route(`${baseUrl}/getAllConductorsList`)
       .get((req: Request, res: Response) =>
-        onBoardingConductorServices.getAllConductorList(req, res, "021G")
+        onBoardingConductorServices.getAllConductorList(req, res, "031G")
       );
   }
 }

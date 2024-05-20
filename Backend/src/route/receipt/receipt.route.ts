@@ -13,7 +13,7 @@ class ReceiptRoute {
     app
       .route(`${baseUrl}/receipt/create`)
       .post((req: Request, res: Response) =>
-        receiptServices.post(req, res, "0101")
+        receiptServices.post(req, res, "010P")
       );
 
     app
